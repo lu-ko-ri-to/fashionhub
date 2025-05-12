@@ -8,9 +8,18 @@ class CartViewModel : ViewModel() {
     private val _cartItems = mutableStateListOf<CartItem>()
     val cartItems: List<CartItem> get() = _cartItems
 
-    fun addItem(item: CartItem) {
-        _cartItems.add(item)
+//    fun addItem(item: CartItem) {
+//        _cartItems.add(item)
+//    }
+fun addItem(item: CartItem) {
+  val existingItemIndex = _cartItems.indexOfFirst { it.name == item.name }
+  if (existingItemIndex != -1) {
+    val existingItem = _cartItems[existingItemIndex]
+    _cartItems[existingItemIndex] = existingItem.copy(quantity = existingItem.quantity + item.quantity)
+  } else {
+    _cartItems.add(item)
     }
+}
 
     fun removeItem(item: CartItem) {
         _cartItems.remove(item)

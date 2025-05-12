@@ -54,6 +54,8 @@ import androidx.navigation.NavController
 import com.mike.thefashionhub.R
 import com.mike.thefashionhub.navigation.ROUT_EXPLORE
 import com.mike.thefashionhub.navigation.ROUT_HOME
+import com.mike.thefashionhub.navigation.ROUT_PRODUCTADMIN_LIST
+import com.mike.thefashionhub.navigation.ROUT_PRODUCT_LIST
 import com.mike.thefashionhub.navigation.ROUT_REGISTER
 import com.mike.thefashionhub.ui.theme.viewmodel.AuthViewModel
 
@@ -75,11 +77,11 @@ fun LoginScreen(
       if (user == null) {
         Toast.makeText(context, "Invalid Credentials", Toast.LENGTH_SHORT).show()
       } else {
-        if (user.role == "admin") {
-          navController.navigate(ROUT_HOME) {
+        if (user.role == "seller") {
+          navController.navigate(ROUT_PRODUCTADMIN_LIST) {
           }
         } else {
-          navController.navigate(ROUT_EXPLORE) {
+          navController.navigate(ROUT_HOME) {
           }
         }
       }

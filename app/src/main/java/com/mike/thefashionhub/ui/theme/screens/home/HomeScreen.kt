@@ -20,20 +20,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +49,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -64,6 +68,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.mike.thefashionhub.R
+import com.mike.thefashionhub.data.UserPreference
+import com.mike.thefashionhub.model.CartItem
+import com.mike.thefashionhub.model.User
 import com.mike.thefashionhub.navigation.ROUT_ADD_PRODUCT
 import com.mike.thefashionhub.navigation.ROUT_CART
 import com.mike.thefashionhub.navigation.ROUT_EXPLORE
@@ -71,18 +78,25 @@ import com.mike.thefashionhub.navigation.ROUT_HOME
 import com.mike.thefashionhub.navigation.ROUT_INTENT
 import com.mike.thefashionhub.navigation.ROUT_OTHERS
 import com.mike.thefashionhub.navigation.ROUT_PRODUCT_LIST
+import com.mike.thefashionhub.navigation.ROUT_START
+import com.mike.thefashionhub.ui.theme.viewmodel.CartViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController,userPreferences: UserPreference,cartViewModel: CartViewModel) {
   val mContext= LocalContext.current
 
 
   //Scaffold
 
   var selectedIndex by remember { mutableIntStateOf(0) }
+  var menuExpanded by remember { mutableStateOf(false)}
 
 
   Scaffold(
@@ -116,9 +130,7 @@ fun HomeScreen(navController: NavHostController) {
           }) {
             Icon(imageVector = Icons.Default.ShoppingCart, contentDescription = "")
           }
-          IconButton(onClick = {}) {
-            Icon(imageVector = Icons.Default.Notifications, contentDescription = "")
-          }
+
           IconButton(onClick = {
             navController.navigate(ROUT_ADD_PRODUCT)
 
@@ -126,7 +138,39 @@ fun HomeScreen(navController: NavHostController) {
           }) {
             Icon(imageVector = Icons.Default.Add, contentDescription = "")
           }
-        })
+          IconButton(onClick = {
+            menuExpanded=true
+
+
+          }) {
+            Icon(imageVector = Icons.Default.ExitToApp, contentDescription = "")
+          }
+
+          DropdownMenu(
+            expanded = menuExpanded,
+            onDismissRequest = { menuExpanded = false }
+          ) {
+            DropdownMenuItem(
+              text = { Text("Logout") },
+              onClick = {
+                menuExpanded = false
+                CoroutineScope(Dispatchers.IO).launch {
+                  userPreferences.clearLogin()
+                  withContext(Dispatchers.Main) {
+                    navController.navigate("login") {
+                      popUpTo(0) { inclusive = true } // Clears the entire back stack
+                      launchSingleTop=true
+
+                    }
+                  }
+                }
+                }
+              )
+          }
+        }
+
+
+      )
 
     },
 
@@ -163,7 +207,7 @@ fun HomeScreen(navController: NavHostController) {
         )
         NavigationBarItem(
           icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Profile") },
-          label = { Text("Insta Buy") },
+          label = { Text("Recent Products") },
           selected = selectedIndex == 2,
           onClick = { selectedIndex = 2
             navController.navigate(ROUT_PRODUCT_LIST)
@@ -189,7 +233,6 @@ fun HomeScreen(navController: NavHostController) {
           horizontalArrangement = Arrangement.SpaceBetween
         ) {
           Text("Fashion Hub", fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Cursive)
-          Icon(Icons.Default.Notifications, contentDescription = "Notifications")
         }
 
 //        Spacer(modifier = Modifier.height(16.dp))
@@ -377,6 +420,7 @@ fun HomeScreen(navController: NavHostController) {
           verticalArrangement = Arrangement.spacedBy(12.dp),
           horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+
           items(1) { index ->
             Card(
               modifier = Modifier.fillMaxWidth(),
@@ -404,9 +448,23 @@ fun HomeScreen(navController: NavHostController) {
                 Text("Cotton T-shirt")
                 Text("Ksh 850", fontWeight = FontWeight.Bold)
                 Row{
-                  
+
 
                   Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite")
+                  Spacer(modifier = Modifier.width(10.dp))
+                  Icon(Icons.Default.ShoppingCart, contentDescription = "cart",
+                    modifier = Modifier.clickable {
+                    cartViewModel.addItem(
+                      CartItem(
+                        id = 1, // Use unique ID per product
+                        name = "T-shirt",
+                        price = 500.0,
+                        imageResId = R.drawable.ttisho)
+
+                    )
+                  }
+                  )
+
                   Spacer(modifier = Modifier.width(10.dp))
 
                   Icon(
@@ -455,6 +513,20 @@ fun HomeScreen(navController: NavHostController) {
                 Row{
                   Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite")
                   Spacer(modifier = Modifier.width(10.dp))
+                  Icon(Icons.Default.ShoppingCart, contentDescription = "cart",
+                    modifier = Modifier.clickable {
+                    cartViewModel.addItem(
+                      CartItem(
+                        id = 2, // Use unique ID per product
+                        name = "T-shirt",
+                        price = 500.0,
+                        imageResId = R.drawable.tttisho)
+
+                    )
+                  }
+                  )
+
+                  Spacer(modifier = Modifier.width(10.dp))
 
                   Icon(
                     imageVector = Icons.Default.Add,
@@ -500,6 +572,19 @@ fun HomeScreen(navController: NavHostController) {
                 Text("Ksh 5000", fontWeight = FontWeight.Bold)
                 Row{
                   Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite")
+                  Spacer(modifier = Modifier.width(10.dp))
+                  Icon(Icons.Default.ShoppingCart, contentDescription = "cart",
+                    modifier = Modifier.clickable {
+                      cartViewModel.addItem(
+                        CartItem(
+                          id = 3, // Use unique ID per product
+                          name = "Full Track Suit",
+                          price = 5000.0,
+                          imageResId = R.drawable.all1)
+
+                      )
+                    }
+                    )
                   Spacer(modifier = Modifier.width(10.dp))
 
                   Icon(
@@ -547,6 +632,19 @@ fun HomeScreen(navController: NavHostController) {
                 Row{
                   Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite")
                   Spacer(modifier = Modifier.width(10.dp))
+                  Icon(Icons.Default.ShoppingCart, contentDescription = "cart",
+                    modifier = Modifier.clickable {
+                      cartViewModel.addItem(
+                        CartItem(
+                          id = 4, // Use unique ID per product
+                          name = "Full Track Suits",
+                          price = 5000.0,
+                          imageResId = R.drawable.all)
+
+                      )
+                    }
+                    )
+                  Spacer(modifier = Modifier.width(10.dp))
 
                   Icon(
                     imageVector = Icons.Default.Add,
@@ -592,6 +690,19 @@ fun HomeScreen(navController: NavHostController) {
                 Text("Ksh 2500", fontWeight = FontWeight.Bold)
                 Row{
                   Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite")
+                  Spacer(modifier = Modifier.width(10.dp))
+                  Icon(Icons.Default.ShoppingCart, contentDescription = "cart",
+                    modifier = Modifier.clickable {
+                      cartViewModel.addItem(
+                        CartItem(
+                          id = 5, // Use unique ID per product
+                          name = "Sweater",
+                          price = 2500.0,
+                          imageResId = R.drawable.sweater2)
+
+                      )
+                    }
+                    )
                   Spacer(modifier = Modifier.width(10.dp))
 
                   Icon(
@@ -639,6 +750,20 @@ fun HomeScreen(navController: NavHostController) {
                 Row{
                   Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite")
                   Spacer(modifier = Modifier.width(10.dp))
+                  Icon(
+                    Icons.Default.ShoppingCart, contentDescription = "cart",
+                    modifier = Modifier.clickable {
+                      cartViewModel.addItem(
+                        CartItem(
+                          id = 6, // Use unique ID per product
+                          name = "Sweater",
+                          price = 2500.0,
+                          imageResId = R.drawable.sweater3)
+
+                      )
+                    }
+                    )
+                  Spacer(modifier = Modifier.width(10.dp))
 
                   Icon(
                     imageVector = Icons.Default.Add,
@@ -685,6 +810,21 @@ fun HomeScreen(navController: NavHostController) {
                 Row{
                   Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite")
                   Spacer(modifier = Modifier.width(10.dp))
+                  Icon(
+
+                    Icons.Default.ShoppingCart, contentDescription = "cart",
+                      modifier = Modifier.clickable {
+                      cartViewModel.addItem(
+                        CartItem(
+                          id = 7, // Use unique ID per product
+                          name = "Sneakers",
+                          price = 4500.0,
+                          imageResId = R.drawable.shoes6)
+
+                      )
+                    }
+                  )
+                  Spacer(modifier = Modifier.width(10.dp))
 
                   Icon(
                     imageVector = Icons.Default.Add,
@@ -730,6 +870,23 @@ fun HomeScreen(navController: NavHostController) {
                 Text("Ksh 4500", fontWeight = FontWeight.Bold)
                 Row{
                   Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorite")
+                  Spacer(modifier = Modifier.width(10.dp))
+                  Icon(
+                    Icons.Default.ShoppingCart, contentDescription = "cart",
+
+                      modifier = Modifier.clickable {
+                      cartViewModel.addItem(
+                        CartItem(
+                          id = 8, // Use unique ID per product
+                          name = "Sneakers",
+                          price = 4500.0,
+                          imageResId = R.drawable.shoes9)
+
+                        )
+                      }
+
+
+                  )
                   Spacer(modifier = Modifier.width(10.dp))
 
                   Icon(
@@ -778,9 +935,9 @@ fun HomeScreen(navController: NavHostController) {
 
 
 
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview(){
-  HomeScreen(navController = rememberNavController())
-}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun HomeScreenPreview(){
+//  HomeScreen(navController = rememberNavController())
+//}

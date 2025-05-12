@@ -1,8 +1,17 @@
 package com.mike.thefashionhub.model
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "cart")
+
 data class CartItem(
-  val id: Int,
+  @PrimaryKey(autoGenerate = true) val id: Int = 0,
   val name: String,
   val price: Double,
-  val quantity: Int
+  val imageResId: Int,
+
+  var quantity: Int=1
+
 )
 

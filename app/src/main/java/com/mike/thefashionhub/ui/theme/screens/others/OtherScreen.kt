@@ -104,7 +104,7 @@ fun OthersScreen(navController: NavController) {
           )
           NavigationBarItem(
             icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Profile") },
-            label = { Text("Insta Buy") },
+            label = { Text("Recent Products") },
             selected = selectedIndex == 2,
             onClick = {
               selectedIndex = 2

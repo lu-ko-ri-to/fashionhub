@@ -79,6 +79,20 @@ dependencies {
   implementation("androidx.compose.runtime:runtime-livedata:1.6.4")
   //lazy vertical grid
   implementation ("androidx.compose.foundation:foundation:1.5.0") // or latest version
+  //lifecycle
+  implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
+  implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+  implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+
+  implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
+  // Coroutines for async operations
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
+
+
+    implementation ("androidx.datastore:datastore-preferences:1.1.6")
 
 
 

@@ -1,7 +1,10 @@
 package com.mike.thefashionhub.ui.theme.screens.cart
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -13,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 // Optional if using shapes and dividers
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 
 // Your data/model classes
 import com.mike.thefashionhub.model.CartItem
@@ -20,8 +24,16 @@ import com.mike.thefashionhub.model.Product
 import com.mike.thefashionhub.ui.theme.viewmodel.CartViewModel
 
 @Composable
-fun CartScreen(viewModel: CartViewModel = viewModel(), cartViewModel: CartViewModel) {
+fun CartScreen(viewModel: CartViewModel = viewModel()) {
   val items = viewModel.cartItems
+  LaunchedEffect(Unit) {
+    items.forEach {
+      println("Cart item: ${it.name}, imageResId = ${it.imageResId}")
+    }
+  }
+
+
+
 
   Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
     Text("Your Cart", fontSize = 24.sp, fontWeight = FontWeight.Bold)
@@ -33,7 +45,6 @@ fun CartScreen(viewModel: CartViewModel = viewModel(), cartViewModel: CartViewMo
         items(items) { item ->
           CartItemRow(
             item = item, onRemove = { viewModel.removeItem(item) },
-            product = TODO(),
             onPay = TODO()
           )
         }
@@ -53,62 +64,34 @@ fun CartScreen(viewModel: CartViewModel = viewModel(), cartViewModel: CartViewMo
     }
   }
 }
-//@Composable
-//fun CartItemRow(item: CartItem, onRemove: () -> Unit) {
-//  Row(
-//    modifier = Modifier
-//      .fillMaxWidth()
-//      .padding(vertical = 8.dp),
-//    horizontalArrangement = Arrangement.SpaceBetween
-//  ) {
-//    Column {
-//      Text(item.name, fontWeight = FontWeight.SemiBold)
-//      Text("Qty: ${item.quantity}")
-//      Text("Price: $${item.price}")
-//    }
-//    IconButton(onClick = onRemove) {
-//      Icon(Icons.Default.Delete, contentDescription = "Remove")
-//    }
-//  }
-//}
+
 @Composable
 fun CartItemRow(
-  product: Product,
   onRemove: () -> Unit,
   onPay: () -> Unit,
   item: CartItem
 ) {
-  Card(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(vertical = 4.dp),
-    elevation = CardDefaults.cardElevation(4.dp)
-  ) {
-    Column(modifier = Modifier.padding(8.dp)) {
-      Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-      ) {
-        Text(product.name, modifier = Modifier.weight(1f))
-        Text("₹${product.price}", modifier = Modifier.padding(horizontal = 8.dp))
-      }
+  Row(modifier = Modifier
+    .fillMaxWidth()
+    .padding(8.dp)) {
 
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(top = 8.dp),
-        horizontalArrangement = Arrangement.End
-      ) {
-        OutlinedButton(onClick = onPay) {
-          Text("Pay")
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        OutlinedButton(onClick = onRemove, colors = ButtonDefaults.outlinedButtonColors(
-          contentColor = Color.Red)) {
-          Text("Delete")
-        }
-      }
+    Image(
+      painter = painterResource(id = item.imageResId),
+      contentDescription = item.name,
+      modifier = Modifier.size(80.dp)
+    )
+
+    Spacer(modifier = Modifier.width(16.dp))
+
+    Column(modifier = Modifier.weight(1f)) {
+      Text(text = item.name, fontWeight = FontWeight.Bold)
+      Text(text = "Price: $${item.price}")
+      Text(text = "Qty: ${item.quantity}")
+    }
+
+    IconButton(onClick = onRemove) {
+      Icon(Icons.Default.Delete, contentDescription = "Remove")
     }
   }
-}
 
+}

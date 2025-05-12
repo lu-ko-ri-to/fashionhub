@@ -90,7 +90,7 @@ fun RegisterScreen(
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally,
 
-  ) {
+    ) {
     Image(
       painter = painterResource(R.drawable.icon3),
       contentDescription = "dress",
@@ -141,7 +141,7 @@ fun RegisterScreen(
 
     //Role
     var role by remember { mutableStateOf("user") }
-    val roleOptions = listOf("user", "admin")
+    val roleOptions = listOf("seller", "customer")
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
@@ -152,7 +152,7 @@ fun RegisterScreen(
         value = role,
         onValueChange = {},
         readOnly = true,
-        label = { Text("Select Role") },
+        label = { Text("Select Criteria") },
         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         modifier = Modifier.menuAnchor().fillMaxWidth()
       )
@@ -229,15 +229,49 @@ fun RegisterScreen(
       contentAlignment = Alignment.Center
     ) {
       Button(
+//        onClick = {
+//          if (username.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
+//            Toast.makeText(context, "All fields are required", Toast.LENGTH_SHORT).show()
+//
+//          }
+//
+//
+//          val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+//          if (!isEmailValid) {
+//            Toast.makeText(context, "Invalid email address", Toast.LENGTH_SHORT).show()
+//
+//          }
+//
+//          if (password != confirmPassword) {
+//            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+//
+//          }
+//           else {
+//            authViewModel.registerUser(User(username = username, email = email, role = role, password = password))
+//            onRegisterSuccess()
+//          }
+//
+//        }
         onClick = {
           if (username.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()) {
             Toast.makeText(context, "All fields are required", Toast.LENGTH_SHORT).show()
-          } else if (password != confirmPassword) {
-            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
-          } else {
-            authViewModel.registerUser(User(username = username, email = email, role = role, password = password))
-            onRegisterSuccess()
+            return@Button
           }
+
+          val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+          if (!isEmailValid) {
+            Toast.makeText(context, "Invalid email address", Toast.LENGTH_SHORT).show()
+            return@Button
+          }
+
+          if (password != confirmPassword) {
+            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            return@Button
+          }
+
+          // If all checks pass
+          authViewModel.registerUser(User(username = username, email = email, role = role, password = password))
+          onRegisterSuccess()
         },
         modifier = Modifier.fillMaxSize(),
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
@@ -252,6 +286,6 @@ fun RegisterScreen(
       onClick = { navController.navigate(ROUT_LOGIN) }
     ) {
       Text("Already have an account? Login")
+      }
     }
-  }
 }

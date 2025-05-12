@@ -1,6 +1,7 @@
 package com.mike.thefashionhub.ui.theme.screens.products
 
 
+
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -83,6 +84,7 @@ import com.mike.thefashionhub.model.Product
 import com.mike.thefashionhub.navigation.ROUT_ADD_PRODUCT
 import com.mike.thefashionhub.navigation.ROUT_EDIT_PRODUCT
 import com.mike.thefashionhub.navigation.ROUT_HOME
+import com.mike.thefashionhub.navigation.ROUT_PRODUCTADMIN_LIST
 import com.mike.thefashionhub.navigation.ROUT_PRODUCT_LIST
 import com.mike.thefashionhub.navigation.editProductRoute
 import com.mike.thefashionhub.ui.theme.viewmodel.ProductViewModel
@@ -93,7 +95,7 @@ import java.io.OutputStream
 @RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductListScreen(navController: NavController,
+fun ProductAdminListScreen(navController: NavController,
                       viewModel: ProductViewModel) {
   val mContext= LocalContext.current
 
@@ -214,7 +216,7 @@ fun ProductListScreen(navController: NavController,
 //
 //      }
 //    },
-    bottomBar = { BottomNavigationBar1(navController) }
+    bottomBar = { BottomNavigationBarr(navController) }
   ) { paddingValues ->
     Column(
       modifier = Modifier
@@ -226,7 +228,7 @@ fun ProductListScreen(navController: NavController,
     ) {
       LazyColumn {
         items(filteredProducts.size) { index ->
-          ProductItem(navController, filteredProducts[index], viewModel)
+          ProductItem1(navController, filteredProducts[index], viewModel)
         }
       }
     }
@@ -235,7 +237,7 @@ fun ProductListScreen(navController: NavController,
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-fun ProductItem(navController: NavController, product: Product, viewModel: ProductViewModel) {
+fun ProductItem1(navController: NavController, product: Product, viewModel: ProductViewModel) {
   val mContext= LocalContext.current
 
   val painter: Painter = rememberAsyncImagePainter(
@@ -345,13 +347,34 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
             )
           }
 
+          // Edit Product
+          IconButton(
+            onClick = {
+              navController.navigate(editProductRoute(product.id))
+            }
+          ) {
+            Icon(
 
+              imageVector = Icons.Default.Edit,
+              contentDescription = "Edit",
+              tint = Color.White
+            )
+          }
 
-
+          // Delete Product
+          IconButton(
+            onClick = { viewModel.deleteProduct(product) }
+          ) {
+            Icon(
+              imageVector = Icons.Default.Delete,
+              contentDescription = "Delete",
+              tint = Color.White
+            )
+          }
 
           // Download PDF
           IconButton(
-            onClick = { generateProductPDF(context, product) }
+            onClick = { generateProductPDF1(context, product) }
           ) {
             Icon(
               painter = painterResource(R.drawable.img_3),
@@ -366,7 +389,7 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
 }
 
 @RequiresApi(Build.VERSION_CODES.Q)
-fun generateProductPDF(context: Context, product: Product) {
+fun generateProductPDF1(context: Context, product: Product) {
   val pdfDocument = PdfDocument()
   val pageInfo = PdfDocument.PageInfo.Builder(300, 500, 1).create()
   val page = pdfDocument.startPage(pageInfo)
@@ -434,16 +457,16 @@ fun generateProductPDF(context: Context, product: Product) {
 
 // Bottom Navigation Bar Component
 @Composable
-fun BottomNavigationBar1(navController: NavController) {
+fun BottomNavigationBarr(navController: NavController) {
   NavigationBar(
     containerColor = Color(0xFFA2B9A2),
     contentColor = Color.White
   ) {
     NavigationBarItem(
       selected = false,
-      onClick = { navController.navigate(ROUT_PRODUCT_LIST) },
-      icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Product List") },
-      label = { Text("Product List") }
+      onClick = { navController.navigate(ROUT_PRODUCTADMIN_LIST) },
+      icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Your Products") },
+      label = { Text("Your Products") }
     )
     NavigationBarItem(
       selected = false,

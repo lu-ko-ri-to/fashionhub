@@ -1,6 +1,10 @@
 package com.mike.thefashionhub.ui.theme.screens.explore
 
 
+import android.net.Uri
+import android.os.Build
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,15 +21,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -35,7 +41,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,9 +58,11 @@ import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.mike.thefashionhub.R
@@ -60,11 +71,17 @@ import com.mike.thefashionhub.navigation.ROUT_EXPLORE
 import com.mike.thefashionhub.navigation.ROUT_HOME
 import com.mike.thefashionhub.navigation.ROUT_OTHERS
 import com.mike.thefashionhub.navigation.ROUT_PRODUCT_LIST
+import com.mike.thefashionhub.ui.theme.viewmodel.PaymentViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExploreScreen(navController: NavController) {
+fun ExploreScreen(
+  navController: NavController,
+  paymentViewModel: PaymentViewModel = viewModel()
+
+) {
   Column(
     modifier = Modifier.fillMaxSize()
   ) {
@@ -72,6 +89,18 @@ fun ExploreScreen(navController: NavController) {
 //    val filteredProducts = productList.filter {
 //      it.name.contains(searchQuery, ignoreCase = true)
 //    }
+
+    var showPaymentDialog by remember { mutableStateOf(false) }
+    var phoneNumber by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val paymentState by paymentViewModel.paymentState.collectAsState()
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var price by remember { mutableStateOf("") }
+
+
+
+
+
 
     //Scaffold
 
@@ -111,7 +140,7 @@ fun ExploreScreen(navController: NavController) {
           )
           NavigationBarItem(
             icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Profile") },
-            label = { Text("Insta Buy") },
+            label = { Text("Recent Products") },
             selected = selectedIndex == 2,
             onClick = {
               selectedIndex = 2
@@ -196,9 +225,10 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+
+                            showPaymentDialog = true
+
+
 
                         },
 
@@ -264,9 +294,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -295,9 +327,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align(Alignment.TopEnd)
                         .clickable {
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -341,9 +375,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -374,9 +410,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -405,9 +443,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -437,9 +477,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -481,9 +523,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -514,9 +558,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -545,9 +591,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -577,9 +625,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -621,9 +671,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -654,9 +706,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -685,9 +739,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -747,9 +803,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -780,9 +838,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -810,9 +870,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+//
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -841,9 +903,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+//
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -886,9 +950,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -919,9 +985,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+//
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -951,9 +1019,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -981,9 +1051,11 @@ fun ExploreScreen(navController: NavController) {
                       tint = Gray,
                       modifier = Modifier.padding(20.dp).align (Alignment.TopEnd)
                         .clickable{
-                          val simToolKitLaunchIntent =
-                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
-                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
+                          showPaymentDialog = true
+
+//                          val simToolKitLaunchIntent =
+//                            mContext.packageManager.getLaunchIntentForPackage("com.android.stk")
+//                          simToolKitLaunchIntent?.let { mContext.startActivity(it) }
 
                         },
 
@@ -1003,12 +1075,79 @@ fun ExploreScreen(navController: NavController) {
               }
 
             }
+            if (showPaymentDialog) {
+              AlertDialog(
+                onDismissRequest = { showPaymentDialog = false },
+                title = { Text("M-Pesa Payment") },
+                text = {
+                  Column {
+                    Text("Enter your M-Pesa phone number")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                      value = phoneNumber,
+                      onValueChange = { phoneNumber = it },
+                      label = { Text("Phone Number") },
+                      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                    )
+                  }
+                },
+                confirmButton = {
+                  Button(
+                    onClick = {
 
+                      val productId = ""
+                      paymentViewModel.initiatePayment(
+                        context = context,
+                        phoneNumber = phoneNumber,
+                        amount = imageUri.toString(),
+                        productId = productId
+                      )
+                      showPaymentDialog = true
+                    }
+                  ) {
+                    Text("Pay")
+                  }
+                },
+                dismissButton = {
+                  TextButton(onClick = { showPaymentDialog = false }) {
+                    Text("Cancel")
+                  }
+                }
+              )
+            }
+
+            // Handle payment state
+            when (val state = paymentState) {
+              is PaymentViewModel.PaymentState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                  CircularProgressIndicator()
+                }
+              }
+              is PaymentViewModel.PaymentState.Success -> {
+                LaunchedEffect(state) {
+                  Toast.makeText(
+                    context,
+                    "STK Push sent. Please check your phone to complete payment.",
+                    Toast.LENGTH_LONG
+                  ).show()
+                }
+              }
+              is PaymentViewModel.PaymentState.Error -> {
+                LaunchedEffect(state) {
+                  Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                }
+              }
+              else -> {}
+            }
           }
+        }
+
+
           //hoodie column
 
 
-  }})}}
+  })}}
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun ExploreScreenPreview(){

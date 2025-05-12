@@ -14,8 +14,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mike.thefashionhub.data.UserDatabase
+import com.mike.thefashionhub.data.UserPreference
 import com.mike.thefashionhub.repository.UserRepository
-import com.mike.thefashionhub.ui.theme.screens.about.AboutScreen
 import com.mike.thefashionhub.ui.theme.screens.auth.RegisterScreen
 import com.mike.thefashionhub.ui.theme.screens.auth.LoginScreen
 import com.mike.thefashionhub.ui.theme.screens.cart.CartScreen
@@ -29,8 +29,10 @@ import com.mike.thefashionhub.ui.theme.viewmodel.AuthViewModel
 import com.mike.thefashionhub.ui.theme.screens.start.StartScreen
 import com.mike.thefashionhub.ui.theme.screens.products.AddProductScreen
 import com.mike.thefashionhub.ui.theme.screens.products.EditProductScreen
+import com.mike.thefashionhub.ui.theme.screens.products.ProductAdminListScreen
 import com.mike.thefashionhub.ui.theme.screens.products.ProductListScreen
 import com.mike.thefashionhub.ui.theme.viewmodel.CartViewModel
+import com.mike.thefashionhub.ui.theme.viewmodel.PaymentViewModel
 import com.mike.thefashionhub.ui.theme.viewmodel.ProductViewModel
 
 
@@ -42,6 +44,9 @@ fun AppNavHost(
   startDestination: String = ROUT_SPLASH,
   productViewModel: ProductViewModel = viewModel(),
   cartViewModel: CartViewModel = viewModel(),
+  paymentViewModel: PaymentViewModel = viewModel(),
+  userPreference: UserPreference
+
 
 
 
@@ -55,13 +60,11 @@ fun AppNavHost(
     modifier = modifier
   ) {
     composable(ROUT_HOME) {
-      HomeScreen(navController)
+      HomeScreen(navController,userPreference,cartViewModel)
     }
-    composable(ROUT_ABOUT) {
-      AboutScreen(navController)
-    }
+
     composable(ROUT_INTENT) {
-      IntentScreen(navController)
+      IntentScreen(navController,userPreference)
     }
     composable(ROUT_START) {
       StartScreen(navController)
@@ -73,18 +76,21 @@ fun AppNavHost(
       OthersScreen(navController)
     }
     composable(ROUT_SPLASH) {
-      SplashScreen(navController)
+      SplashScreen(navController,userPreference)
     }
+    //favorite
+
+
     //cart
-    composable("cart") {
-      CartScreen(cartViewModel = cartViewModel)
+    composable(ROUT_CART) {
+      CartScreen(cartViewModel)
     }
     //AUTHENTICATION
 
     // Initialize Room Database and Repository for Authentication
     val appDatabase = UserDatabase.getDatabase(context)
     val authRepository = UserRepository(appDatabase.userDao())
-    val authViewModel = AuthViewModel(authRepository)
+    val authViewModel = AuthViewModel(authRepository,userPreference)
     composable(ROUT_REGISTER) {
       RegisterScreen(authViewModel, navController) {
         navController.navigate(ROUT_LOGIN) {
@@ -108,6 +114,9 @@ fun AppNavHost(
 
     composable(ROUT_PRODUCT_LIST) {
       ProductListScreen(navController,productViewModel)
+    }
+    composable(ROUT_PRODUCTADMIN_LIST) {
+      ProductAdminListScreen(navController,productViewModel)
     }
 
     composable(
